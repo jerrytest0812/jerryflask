@@ -1,10 +1,9 @@
-from dataclasses import dataclass
-from flask import Flask, render_template ,request,Response
+from flask import Flask, render_template ,request,Response,redirect,url_for,jsonify
 app = Flask(__name__)
 @app.route("/")
 def hello():
     # a = int(request.args.get('a'))
-    return "hello, world"
+    return "hello, AAAAAAA"
 
 @app.route("/<int:id>",methods=['GET'])
 def queryDataMessageByName(id):
@@ -42,11 +41,35 @@ def pageDate():
         '04' : 'QQQ QQQ QQQ',
         '05' : '中文 可以 嗎?'
     }
-    return render_template('page.html' , data=data)
+    return render_template('page.html' , data=data,text = "text內容")
 
 @app.route('/static')
 def staticPage():
+
     return render_template('static.html')
 
+@app.route('/form')
+def formPage():
+    return render_template('form.html')
+
+@app.route('/submit',methods=['POST','GET'])
+def submit():
+    try:
+        if request.method == 'POST':
+            user = request.form['user']
+            print("post : user =>",user)
+            return redirect(url_for('success', name=user, action='post'))
+        else:
+            user = request.args.get('user')
+            print("get : user =>",user)
+            return redirect(url_for('success', name=user, action="get"))
+    except:
+        return 'QQQ'
+@app.route('/success/<action>/<name>')
+def success(name, action):
+    return '{} : Welcome {} ~ !!!'.format(action, name)
+
+
+
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', port=5000) #host='0.0.0.0' 使用現在IP
