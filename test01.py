@@ -1,4 +1,5 @@
-from flask import Flask, render_template ,request,Response,redirect,url_for,jsonify
+
+from flask import Flask, render_template ,request,Response,redirect,url_for,jsonify,json
 app = Flask(__name__)
 @app.route("/")
 def hello():
@@ -69,7 +70,36 @@ def submit():
 def success(name, action):
     return '{} : Welcome {} ~ !!!'.format(action, name)
 
+@app.route('/data')
+def webapi():
+    return render_template('data.html')
 
+@app.route('/data/message',methods=['GET'])
+def getDataMessage():
+    if request.method == 'GET':
+        with open ('jerryflask\static\data\message.json','r') as f :
+            data = json.load(f)
+            print('text:',data)
+        f.close
+        return jsonify(data)
+
+@app.route('/data/message',methods=['POST'])
+def setDataMessage():
+    if request.method == 'POST':
+        data={
+            'appInfo':{
+                'id':request.form['app_id'],
+                'name':request.form['app_name'],
+                'version':request.form['app_version'],
+                'author':request.form['app_author'],
+                'remark':request.form['app_remark']
+            }
+        }
+        print(type(data))
+        with open ('jerryflask\static\data\input.json','a') as f :
+            json.dump(data,f)
+        f.close
+        return jsonify(result='OK')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000) #host='0.0.0.0' 使用現在IP
